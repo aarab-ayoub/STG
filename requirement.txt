@@ -1,0 +1,8 @@
+streamlit
+python-docx
+sentence-transformers
+langchain
+langchain-community
+ollama
+pytesseract
+Pillow
