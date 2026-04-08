@@ -5,9 +5,7 @@ import streamlit as st
 from docx import Document
 import numpy as np
 
-# ----------------------------
 # CONFIG
-# ----------------------------
 DOCS_FOLDER = "docs"
 EMBED_MODEL_NAME = "all-MiniLM-L6-v2"
 TOP_K = 3
@@ -15,9 +13,7 @@ TOP_K = 3
 # Reduce noisy tokenizer threading warnings in constrained local environments.
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
-# ----------------------------
 # LOAD DOCX
-# ----------------------------
 def extract_docx_content(file_path: str) -> str:
     """
     Extract paragraphs + tables from a .docx file.
@@ -41,9 +37,7 @@ def extract_docx_content(file_path: str) -> str:
 
     return "\n".join(parts)
 
-# ----------------------------
 # CHUNKING
-# ----------------------------
 def chunk_text(text: str, chunk_size: int = 700, overlap: int = 120):
     """
     Basic character-based chunking.
@@ -60,9 +54,7 @@ def chunk_text(text: str, chunk_size: int = 700, overlap: int = 120):
 
     return chunks
 
-# ----------------------------
 # BUILD VECTOR INDEX
-# ----------------------------
 @st.cache_resource
 def build_knowledge_base():
     from sentence_transformers import SentenceTransformer
@@ -94,9 +86,7 @@ def build_knowledge_base():
 
     return model, embeddings, documents, metadata
 
-# ----------------------------
 # RETRIEVAL
-# ----------------------------
 def retrieve(query: str, model, embeddings, documents, metadata, top_k: int = TOP_K):
     
     query_emb = model.encode([query], convert_to_numpy=True).astype("float32")[0]
@@ -113,9 +103,7 @@ def retrieve(query: str, model, embeddings, documents, metadata, top_k: int = TO
         })
     return results
 
-# ----------------------------
 # PROMPT BUILDING
-# ----------------------------
 def build_prompt(user_query: str, retrieved_chunks):
     context = "\n\n".join(
         [f"[Source: {c['source']} | Chunk {c['chunk_id']}]\n{c['text']}" for c in retrieved_chunks]
@@ -143,9 +131,7 @@ User incident:
 """
     return prompt.strip()
 
-# ----------------------------
 # LOCAL LLM CALL (OLLAMA)
-# ----------------------------
 def ask_ollama(prompt: str, model_name: str = "llama3:8b"):
     """
     Requires local Ollama running:
@@ -162,9 +148,7 @@ def ask_ollama(prompt: str, model_name: str = "llama3:8b"):
     except Exception as e:
         return f"Local LLM error: {e}"
 
-# ----------------------------
 # UI
-# ----------------------------
 def main():
     st.set_page_config(page_title="Incident Chatbot", layout="wide")
     st.title("ServiceNow Incident Analysis Chatbot")
